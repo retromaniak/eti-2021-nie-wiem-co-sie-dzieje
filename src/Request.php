@@ -15,6 +15,11 @@ class Request
     private $queryParameters;
 
     /**
+     * @var array
+     */
+    private $pathParamaters = [];
+
+    /**
      * @param string $path
      * @param array $queryParameters
      */
@@ -92,8 +97,27 @@ class Request
         $this->queryParameters = $queryParameters;
     }
 
-    public function addParam($parameter)
+    /**
+     * @param $parameters
+     */
+    public function setPathParameters($parameters)
     {
-        $this->queryParameters[] = $parameter;
+        $this->pathParamaters = $parameters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameter($name, $default = null)
+    {
+        return $this->pathParamaters[$name] ?? $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPathParamaters()
+    {
+        return $this->pathParamaters;
     }
 }

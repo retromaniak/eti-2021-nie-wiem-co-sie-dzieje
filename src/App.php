@@ -5,6 +5,11 @@ namespace App;
 class App
 {
     /**
+     * @var request
+     */
+    private $request;
+
+    /**
      * @var string
      */
     private $page;
@@ -19,7 +24,7 @@ class App
         $router = new Router($this->getRoutes());
         $page = $router->match($request);
 
-        $layout = new Layout($page);
+        $layout = new Layout($request, $page);
         $layout->render();
     }
 
@@ -37,9 +42,18 @@ class App
     private function getRoutes(): array
     {
         return [
-            '/' => 'home',
-            '/article' => 'article',
-            '/body' => 'body'
+            'homepage' => [
+                'path' => '/',
+                'page' => 'home'
+            ],
+            'article' => [
+                'path' => '/article/{id}',
+                'page' => 'article'
+            ],
+            'body' => [
+                'path' => '/body',
+                'page' => 'body'
+            ]
         ];
     }
 }
