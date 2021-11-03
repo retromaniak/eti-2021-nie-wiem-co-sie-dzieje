@@ -1,3 +1,3 @@
-3
+próba
 <?php
-    var_dump($request->getPathParameters());
+    var_dump($router->generate('article'));

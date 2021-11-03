@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Controllers\ControllerInterface;
+
 class Router
 {
     /**
@@ -17,19 +19,24 @@ class Router
         $this->routes = $routes;
     }
 
+    /**
+     * @param Request $request
+     * @return string|ControllerInterface
+     * @throws \Exception
+     */
     public function match(Request $request)
     {
-        $trimmedRequestPath = ltrim('/', $request->getPath());
+        $trimmedRequestPath = ltrim($request->getPath(), '/');
         $requestPathSegments = explode('/', $trimmedRequestPath);
 
         foreach ($this->routes as $routeName => $routeConfig) {
-            $trimmedRoute = ltrim('/', $routeConfig['path']);
+            $trimmedRoute = ltrim($routeConfig['path'], '/');
             $routeSegments = explode('/', $trimmedRoute);
 
             $params = $this->checkRoute($routeSegments, $requestPathSegments);
             if ($params !== false) {
                 $request->setPathParameters($params);
-                return $routeConfig['page'];
+                return $routeConfig['controller'] ?? $routeConfig['page'];
             }
         }
         throw new \Exception('Page not found! Sorry!');
@@ -54,18 +61,25 @@ class Router
         }
         return $params;
     }
-    public function generateUrl($name, $parameters = null)
+
+    public function generate($name, $params = [])
     {
-        foreach ($this->routes as $key => $value)
-        {
-            if ($key === $name)
-            {
-                $url = $value['path'];
-                if (isset($parameters))
-                {
-                    $url = str_replace('{id}', $parameters['id'], $value['path']);
-                }
+        if (!isset($this->routes[$name])) {
+            throw new \Exception(sprintf('Route "%s" not found.', $name));
+        }
+
+        $path = $this->routes[$name]['path'];
+        $trimmedRoute = ltrim($path, '/');
+        $routeSegments = explode('/', $trimmedRoute);
+        $uri = [];
+        for ($i = 0; $i < count($routeSegments); $i++) {
+            if (preg_match('/^{(.*)}$/', $routeSegments[$i], $m)) {
+                $uri[] = $params[$m[1]] ?? '';
+            } else {
+                $uri[] = $routeSegments[$i];
             }
         }
+
+        return '/' . implode('/', $uri);
     }
 }
