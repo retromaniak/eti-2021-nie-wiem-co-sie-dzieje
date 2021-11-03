@@ -1,4 +1,3 @@
-<!doctype html>
 <?php
 	include __DIR__ . '/../vendor/autoload.php';
     //var_dump($_SERVER['REQUEST_URI']);
