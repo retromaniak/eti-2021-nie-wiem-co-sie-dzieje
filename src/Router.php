@@ -54,4 +54,18 @@ class Router
         }
         return $params;
     }
+    public function generateUrl($name, $parameters = null)
+    {
+        foreach ($this->routes as $key => $value)
+        {
+            if ($key === $name)
+            {
+                $url = $value['path'];
+                if (isset($parameters))
+                {
+                    $url = str_replace('{id}', $parameters['id'], $value['path']);
+                }
+            }
+        }
+    }
 }
