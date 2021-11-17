@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Controllers\ControllerInterface;
-use App\Response\ErrorResponse;
+use App\Exception\PageNotFoundException;
 
 class Router
 {
@@ -15,39 +15,50 @@ class Router
     /**
      * @param array $routes
      */
-    public function __construct(array $routes)
+    public function __construct(array $routes = [])
     {
         $this->routes = $routes;
     }
 
+    /**
+     * @param string $name
+     * @param array $routeConfig
+     */
+    public function addRoute(string $name, array $routeConfig)
+    {
+        $this->routes[$name] = $routeConfig;
+    }
+
+    /**
+     * @param Request $request
+     * @return string|ControllerInterface
+     * @throws \Exception
+     */
     public function match(Request $request)
     {
-
-        $trimmedRequestPath = ltrim($request->getPath(),'/');
+        $trimmedRequestPath = ltrim($request->getPath(), '/');
         $requestPathSegments = explode('/', $trimmedRequestPath);
 
         foreach ($this->routes as $routeName => $routeConfig) {
-            $trimmedRoute = ltrim($routeConfig['path'],'/');
+            $trimmedRoute = ltrim($routeConfig['path'], '/');
             $routeSegments = explode('/', $trimmedRoute);
 
             $params = $this->checkRoute($routeSegments, $requestPathSegments);
             if ($params !== false) {
                 $request->setPathParameters($params);
-                $controllerFactory = $routeConfig['controller']?? null;
-                if(is_callable($controllerFactory)){
+                $controllerFactory = $routeConfig['controller'] ?? null;
+                if ($controllerFactory instanceof \Closure) {
                     return $controllerFactory();
+                } else {
+                    if ($controllerFactory instanceof ControllerInterface) {
+                        return $controllerFactory;
+                    }
                 }
-                else if ($controllerFactory instanceof ControllerInterface){
-                 return $controllerFactory;
-                }
-
-                throw new \Exception('Page not found! Sorry!');
+                throw new PageNotFoundException();
             }
         }
-        throw new \Exception('Page not found! Sorry!');
-
-
-        }
+        throw new PageNotFoundException();
+    }
 
     /**
      * @param array $routeSegments
@@ -69,19 +80,24 @@ class Router
         return $params;
     }
 
-    public function generateUrl($name, $parameters = [])
+    public function generate($name, $params = [])
     {
         if (!isset($this->routes[$name])) {
             throw new \Exception(sprintf('Route "%s" not found.', $name));
         }
-        foreach ($this->routes as $key => $value) {
-            if ($key === $name){
-                $url = $value['path'];
-                if (isset($parameters)) {
-                    $url = str_replace('{id}', $parameters['id'], $value['path']);
-                }
+
+        $path = $this->routes[$name]['path'];
+        $trimmedRoute = ltrim($path, '/');
+        $routeSegments = explode('/', $trimmedRoute);
+        $uri = [];
+        for ($i = 0; $i < count($routeSegments); $i++) {
+            if (preg_match('/^{(.*)}$/', $routeSegments[$i], $m)) {
+                $uri[] = $params[$m[1]] ?? '';
+            } else {
+                $uri[] = $routeSegments[$i];
             }
         }
-        return $url;
+
+        return implode('\\', $uri);
     }
 }

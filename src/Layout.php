@@ -2,69 +2,75 @@
 
 namespace App;
 
+/**
+ * Klasa przetwarzająca layouty aplikacji. Odpowiada zarenderowanie stron/szablonów.
+ */
 class Layout
 {
     /**
      * @var string
      */
-        private  $name;
-    /**
-     * @var string
-     */
-        private $page;
-    /**
-     * @var string
-     */
-        private $title;
-    /**
-     * @var Request
-     */
-        private $request;
+    private $name;
 
     /**
-     * @param $page
+     * @var string
+     */
+    private $page;
+
+    /**
+     * @var string
+     */
+    private $title;
+
+    /**
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @param string $page
      * @param string $name
      * @param string $title
+     * @param array $params
      */
-        public function __construct(
-            Request $request,
-            string $page,
-            string $name ='default',
-            string $title = 'APSL Website'
-        ){
-            $this->page = $page;
-            $this->name = $name;
-            $this->title = $title;
-            $this->request=$request;
 
-        }
+    public function __construct(
+        string $page,
+        string $name,
+        string $title = 'APSL Website!',
+        array $params
+    ) {
+        $this->page = $page;
+        $this->name = $name;
+        $this->title = $title;
+        $this->params = $params;
+    }
 
     /**
-     * process layout
+     * Process and render layout
+     * @return string
      */
-        public  function  render(): string
-        {
-            extract([
-                'title'=>$this->title,
-                'content'=> $this->renderTemplate()
-            ]);
-            ob_start();
-            include __DIR__."/../layouts/{$this->name}.php";
-            return ob_get_clean();
+    public function render(): string
+    {
+        extract(array_merge($this->params, [
+            'title' => $this->title,
+            'content' => $this->renderTemplate()
+        ]));
 
-        }
+        ob_start();
+        include __DIR__ . "/../layouts/{$this->name}.php";
+        return ob_get_clean();
+    }
 
     /**
-     * process template/page
+     * Proces template/page
      */
-        private function  renderTemplate(): string
-        {
-            ob_start();
-            extract([
-                'request'=>$this->request,
-                'router' => ServiceContainer::getInstance()->getService('router')
-            ]);
-            include "../templates/{$this->page}.php";
-            return ob_get_clean();
-        }
+    private function renderTemplate(): string
+    {
+        ob_start();
+        extract($this->params);
+        include "../templates/{$this->page}.php";
+
+        return ob_get_clean();
+    }
 }

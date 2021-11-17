@@ -7,40 +7,48 @@ class Response
     /**
      * @var array
      */
-private $headers;
+    private $headers;
 
     /**
      * @var string
      */
-private $body;
+    private $body;
 
     /**
      * @var int
      */
-private $status;
+    private $status;
 
     /**
      * @param $body
      * @param array $headers
      * @param int $status
      */
-    public function __construct($body,$headers = [],$status = 200)
+    public function __construct($body, array $headers = [], int $status = 200)
     {
-       $this->body = $body;
-       $this->headers = $headers;
-       $this->status = $status;
+        $this->body = $body;
+        $this->headers = $headers;
+        $this->status = $status;
     }
 
-    public  function  getHeaders()
+    /**
+     * @return array
+     */
+    public function getHeaders(): array
     {
         $genericHeaders = [
-            sprintf('HTTP/1.1 %s',$this->status),
-            sprintf('Content-Length: %s',strlen($this->body))
+            sprintf('HTTP/1.1 %s', $this->status),
+            sprintf('Content-Length: %d', strlen($this->body))
         ];
-        return array_merge($genericHeaders,$this->headers);
+
+        return array_merge($genericHeaders, $this->headers);
     }
-    public  function getBody():string
+
+    /**
+     * @return string
+     */
+    public function getBody(): string
     {
-        return $this->body ;
+        return $this->body;
     }
 }

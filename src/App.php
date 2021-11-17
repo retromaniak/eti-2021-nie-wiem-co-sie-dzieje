@@ -4,6 +4,8 @@ namespace App;
 
 use App\Controllers\ControllerInterface;
 use App\Response\ErrorResponse;
+use App\Exception\PageNotFoundException;
+use Exception;
 
 /**
  * Application entry point.
@@ -18,36 +20,34 @@ class App
      * @var Request
      */
     private $request;
+
     /**
      * Uruchamia apke.
      */
 
-    public function run(): void{
-
-
+    public function run(): void
+    {
         //$this->processRouting();
-
         $this->request = Request::initialize();
         $serviceContainer = ServiceContainer::getInstance();
-        $router = $serviceContainer->getService('router');
-try {
-    $matchedRoute = $router->match($this->request);
-    $response = $matchedRoute($this->request);
+        $router = $serviceContainer->get('router');
 
-    foreach ($response->getHeaders() as $header) {
-        header($header);
-    }
-
-    echo $response->getBody();
-}
-catch(\Exception $exception) {
-    echo "strona nie znaleziona";
-    new Response\Response('home');
-}
+        try {
+            /** @var Router $router */
+            $matchedRoute = $router->match($this->request);
+            $response = $matchedRoute($this->request);
+        } catch (PageNotFoundException $exception) {
+            $response = new ErrorResponse($router, $exception, 404);
+        } catch (Exception $exception) {
+            $response = new ErrorResponse($router, $exception, 500);
         }
 
 
+        foreach ($response->getHeaders() as $header) {
+            header($header);
+        }
+
+        echo $response->getBody();
+
     }
-
-
-
+}

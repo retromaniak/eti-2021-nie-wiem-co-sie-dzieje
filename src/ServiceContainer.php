@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Controllers\PageController;
-use App\Controllers\SimpleController;
+use App\Session\Session;
 
 class ServiceContainer
 {
@@ -13,49 +13,45 @@ class ServiceContainer
 
     private function __construct()
     {
-        $this->services['router'] = function() {
-            return new Router(
-                [
-                    'homepage' => [
-                        'path'=>'/',
-                        //'page'=>'home'
-                        'controller'=> function() {
-                    return new PageController('home','default');
-                }
-                    ],
-                    'article' => [
-                        'path'=>'/article/{id}',
-                        'controller'=> function() {
-                            return new PageController('article','default');
-                }
+        $this->services['router'] = function () {
+            $router = new Router();
 
-                    ],
-                    'body' => [
-                        'path'=>'/body',
-                        'controller'=> function() {
-                    return new PageController('body','default');
+            $router->addRoute('home', [
+                'path' => '/',
+                'controller' => function () use ($router) {
+                    return new PageController($router, 'home', 'default');
                 }
-
-                    ],
-                    'responseTest' => [
-                        'path'=>'/jsonTest',
-                        'controller' => function() {
-                    return new SimpleController();
+            ]);
+            $router->addRoute('article', [
+                'path' => '/article',
+                'controller' => function () use ($router) {
+                    return new PageController($router, 'article', 'default');
                 }
+            ]);
+            $router->addRoute('body', [
+                'path' => '/body',
+                'controller' => function () use ($router) {
+                    return new PageController($router, 'body', 'default');
+                }
+            ]);
 
-                    ]
-                ]
-            );
+            $router->addRoute('invalid', [
+                'path' => '/invalid'
+            ]);
+
+            return $router;
         };
-
+        $this->services['session'] = function (){
+            return new Session();
+        };
     }
 
     /**
      * @return ServiceContainer
      */
-    public static function  getInstance(): ServiceContainer
+    public static function getInstance(): ServiceContainer
     {
-        if(!isset(self::$instance)){
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
 
@@ -67,10 +63,10 @@ class ServiceContainer
      * @return mixed
      * @throws \Exception
      */
-    public function getService(string $id)
+    public function get(string $id)
     {
-        if(!$this->has($id)){
-            throw new \Exception(sprintf('Selected service %s was not found',$id));
+        if (!$this->has($id)) {
+            throw new \Exception(sprintf('Selected service %s was not found...', $id));
         }
 
         return $this->services[$id]($this);
