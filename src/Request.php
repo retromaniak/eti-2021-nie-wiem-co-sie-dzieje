@@ -116,8 +116,8 @@ class Request
     /**
      * @return array
      */
-    public function getPathParamaters()
+    public function getPathParameters()
     {
-        return $this->pathParamaters;
+        return $this->pathParameters;
     }
 }

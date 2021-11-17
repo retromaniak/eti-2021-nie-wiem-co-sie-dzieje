@@ -1,20 +1,20 @@
 <?php
+
 namespace App\Controllers;
+
 use App\Request;
-use App\Responce;
+use App\Response\JsonResponse;
+use App\Response\Response;
+
 class SimpleController implements ControllerInterface
 {
     /**
      * @param Request $request
-     * @return Responce
+     * @return Response
      */
-    public function __invoke(Request $request): Responce
+    public function __invoke(Request $request): Response
     {
-        $body = [
-            'Some test value',
-            'param1' => 'value1'
-        ];
-        $additionalHeaders = ['Content-Type: application/json'];
-        return new Responce(json_encode($body), $additionalHeaders);
+        $body = ['Some test value','param1' => 'value 1'];
+        return new JsonResponse($body);
     }
 }

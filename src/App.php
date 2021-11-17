@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Controllers\ControllerInterface;
+use App\Response\ErrorResponse;
 
 /**
  * Application entry point.
@@ -13,35 +14,40 @@ class App
      * @var string
      */
     private $page;
-
     /**
      * @var Request
      */
     private $request;
-
     /**
-     * Uruchamia aplikację.
+     * Uruchamia apke.
      */
-    public function run(): void
-    {
+
+    public function run(): void{
+
+
         //$this->processRouting();
+
         $this->request = Request::initialize();
         $serviceContainer = ServiceContainer::getInstance();
-        $router = $serviceContainer->get('router');
+        $router = $serviceContainer->getService('router');
+try {
+    $matchedRoute = $router->match($this->request);
+    $response = $matchedRoute($this->request);
 
-        /** @var Router $router */
-        $matchedRoute = $router->match($this->request);
-        if ($matchedRoute instanceof ControllerInterface) {
-            $response = $matchedRoute($this->request);
-            foreach ($response->getHeaders() as $header) {
-                header($header);
-            }
-
-            echo $response->getBody();
-
-        } else {
-            $layout = new Layout($this->request, $matchedRoute);
-            $layout->render();
-        }
+    foreach ($response->getHeaders() as $header) {
+        header($header);
     }
+
+    echo $response->getBody();
 }
+catch(\Exception $exception) {
+    echo "strona nie znaleziona";
+    new Response\Response('home');
+}
+        }
+
+
+    }
+
+
+
