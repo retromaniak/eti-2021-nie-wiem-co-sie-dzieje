@@ -1,1 +1,1 @@
-<p>Strona nie została odnaleziona</p>
+<p> Strona nie została odnaleziona! XD</p>

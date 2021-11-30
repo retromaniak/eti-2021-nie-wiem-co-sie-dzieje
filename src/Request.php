@@ -20,13 +20,31 @@ class Request
     private $pathParamaters = [];
 
     /**
-     * @param string $path
-     * @param array $queryParameters
+     * @var string
      */
-    private function __construct(string $path, array $queryParameters)
-    {
+    private string $method = 'GET';
+
+    /**
+     * @var array
+     */
+    private array $post = [];
+
+    /**
+     * @param string $path
+     * @param string $method
+     * @param array $queryParameters
+     * @param array $post
+     */
+    private function __construct(
+        string $path,
+        string $method,
+        array $queryParameters,
+        array $post
+    ) {
         $this->path = $path;
         $this->queryParameters = $queryParameters;
+        $this->method = $method;
+        $this->post = $post;
     }
 
     /**
@@ -43,7 +61,25 @@ class Request
             $path = substr($uri, 0, $index);
         }
 
-        return new self($path, $_GET);
+        return new self($path, $_SERVER['REQUEST_METHOD'], $_GET, $_POST);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPost(): bool
+    {
+        return strtoupper($this->method) === 'POST';
+    }
+
+    /**
+     * @param string $name
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getPost(string $name, $default = null)
+    {
+        return $this->post[$name] ?? $default;
     }
 
     /**
@@ -116,8 +152,8 @@ class Request
     /**
      * @return array
      */
-    public function getPathParameters()
+    public function getPathParamaters()
     {
-        return $this->pathParameters;
+        return $this->pathParamaters;
     }
 }

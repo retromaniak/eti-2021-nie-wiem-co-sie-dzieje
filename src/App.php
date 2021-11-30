@@ -3,8 +3,10 @@
 namespace App;
 
 use App\Controllers\ControllerInterface;
-use App\Response\ErrorResponse;
 use App\Exception\PageNotFoundException;
+use App\Response\ErrorResponse;
+
+use App\Response\LayoutResponse;
 use Exception;
 
 /**
@@ -20,7 +22,6 @@ class App
      * @var Request
      */
     private $request;
-
     /**
      * Uruchamia apke.
      */
@@ -42,12 +43,12 @@ class App
             $response = new ErrorResponse($router, $exception, 500);
         }
 
-
         foreach ($response->getHeaders() as $header) {
             header($header);
         }
 
         echo $response->getBody();
 
-    }
-}
+
+    }}
+

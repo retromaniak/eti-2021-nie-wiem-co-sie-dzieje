@@ -98,6 +98,6 @@ class Router
             }
         }
 
-        return implode('\\', $uri);
+        return '/' . implode('/', $uri);
     }
 }

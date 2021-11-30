@@ -54,7 +54,8 @@ class Layout
     {
         extract(array_merge($this->params, [
             'title' => $this->title,
-            'content' => $this->renderTemplate()
+            'content' => $this->renderTemplate(),
+            'session' => ServiceContainer::getInstance()->get('session')
         ]));
 
         ob_start();
