@@ -4,6 +4,9 @@ namespace App;
 
 class FlashMessages
 {
+    /**
+     * @var array $messages
+     */
     private array $messages;
 
     public function hasMessages(): bool
