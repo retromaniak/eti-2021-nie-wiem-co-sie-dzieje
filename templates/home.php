@@ -1,1 +1,1 @@
-<?php
+<p>Home Page</p>

@@ -2,11 +2,8 @@
 
 namespace App;
 
-use App\Controllers\ControllerInterface;
 use App\Exception\PageNotFoundException;
 use App\Response\ErrorResponse;
-
-use App\Response\LayoutResponse;
 use Exception;
 
 /**
@@ -18,14 +15,15 @@ class App
      * @var string
      */
     private $page;
+
     /**
      * @var Request
      */
     private $request;
-    /**
-     * Uruchamia apke.
-     */
 
+    /**
+     * Uruchamia aplikację.
+     */
     public function run(): void
     {
         //$this->processRouting();
@@ -49,6 +47,5 @@ class App
 
         echo $response->getBody();
 
-
-    }}
-
+    }
+}

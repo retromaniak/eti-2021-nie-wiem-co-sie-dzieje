@@ -1,1 +1,1 @@
-<h2>welcome to body page</h2>
+<p>Some Custom Body Page</p>

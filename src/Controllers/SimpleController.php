@@ -14,7 +14,11 @@ class SimpleController implements ControllerInterface
      */
     public function __invoke(Request $request): Response
     {
-        $body = ['Some test value','param1' => 'value 1'];
+        $body = [
+            'Some test value',
+            'param1' => 'value 1'
+        ];
+
         return new JsonResponse($body);
     }
 }

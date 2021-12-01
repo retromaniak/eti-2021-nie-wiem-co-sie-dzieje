@@ -1,10 +1,11 @@
 <?php
 
-namespace  App\Controllers;
+namespace App\Controllers;
+
 use App\Request;
 use App\Response\Response;
 
 interface ControllerInterface
 {
-    public  function  __invoke(Request $request):Response;
+    public function __invoke(Request $request): Response;
 }
